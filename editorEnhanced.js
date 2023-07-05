@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         宿房网后台新闻编辑器功能增强
+// @license      GPL-3.0 License
 // @namespace    https://www.0557fdc.com/
-// @version      0.1
-// @description  宿房网后台新闻编辑器功能增强
+// @version      0.11
+// @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
 // @icon         https://www.0557fdc.com/admin/favicon.ico

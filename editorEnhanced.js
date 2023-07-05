@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
-// @namespace    https://www.0557fdc.com/
-// @version      0.11
+// @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
+// @version      0.12
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -170,24 +170,27 @@
 
   function formtNewsInformation (parentSelector) {
     const parent = document.querySelector(parentSelector)
-    const regex  = /( |,|，|、)+(宿房网|宿州市)/g
+    const keywordsRegex  = /( |,|，|、)+(宿房网|宿州市)/g;
+    const titleRegex = / +\||\||\| +/g;
+    const moreBlankRegex = /\s+/g;
+    const noneNecessarySymblo =/ |，|、/g;
     const title = parent.querySelector("[placeholder='请输入标题']");
     const keywords = parent.querySelector("[placeholder='请输入关键词']");
     const description = parent.querySelector("[placeholder='请输入摘要']");
     const seoTitle = parent.querySelector("[placeholder='请输入seo标题']");
     const seoKeywords = parent.querySelector("[placeholder='请输入seo关键词']");
     const seoDescription = parent.querySelector("[placeholder='请输入seo描述']");
-    const titleX = title.value.replace(/\| ?|\|| \|/g, "丨");
-    const keywordsX = keywords.value.replace(regex,"").replace(/\s+/g, " ").replace(/ |，|、/g, ",");
-    const descriptionX = decodeHTMLEntities(description.value)
-    const seoTitleX = seoTitle.value.replace(/\| ?|\|| \|/g, "丨");
-    const seoKeywordsX = seoKeywords.value.replace(regex,"").replace(/\s+/g, " ").replace(/ |，|、/g, ",");
-    const seoDescriptionX = decodeHTMLEntities(seoDescription.value)
+    const titleX = title.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
+    const keywordsX = keywords.value.replace(keywordsRegex,"").replace(noneNecessarySymblo, ",");
+    const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, " ").replace(keywordsRegex,"")
+    const seoTitleX = seoTitle.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
+    const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex,"").replace(noneNecessarySymblo, ",");
+    const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex,"")
     setInputValue(title, `${titleX}`);
     setInputValue(keywords, `${keywordsX}`);
     setInputValue(description, `${descriptionX}`);
     setInputValue(seoTitle, `${seoTitleX}`);
-    if(regex.test(seoKeywords)){
+    if(keywordsRegex.test(seoKeywords)){
       setInputValue(seoKeywords, `${seoKeywordsX}`);
     }else{
       setInputValue(seoKeywords, `${seoKeywordsX},宿州市,宿房网`);

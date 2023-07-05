@@ -173,7 +173,7 @@
     const keywordsRegex  = /( |,|，|、)+(宿房网|宿州市)/g;
     const titleRegex = / +\||\||\| +/g;
     const moreBlankRegex = /\s+/g;
-    const noneNecessarySymblo =/ |，|、/g;
+    const noneNecessarySymbol =/ |，|、/g;
     const title = parent.querySelector("[placeholder='请输入标题']");
     const keywords = parent.querySelector("[placeholder='请输入关键词']");
     const description = parent.querySelector("[placeholder='请输入摘要']");
@@ -181,10 +181,10 @@
     const seoKeywords = parent.querySelector("[placeholder='请输入seo关键词']");
     const seoDescription = parent.querySelector("[placeholder='请输入seo描述']");
     const titleX = title.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
-    const keywordsX = keywords.value.replace(keywordsRegex,"").replace(noneNecessarySymblo, ",");
+    const keywordsX = keywords.value.replace(keywordsRegex,"").replace(noneNecessarySymbol, ",");
     const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, " ").replace(keywordsRegex,"")
     const seoTitleX = seoTitle.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
-    const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex,"").replace(noneNecessarySymblo, ",");
+    const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex,"").replace(noneNecessarySymbol, ",");
     const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex,"")
     setInputValue(title, `${titleX}`);
     setInputValue(keywords, `${keywordsX}`);

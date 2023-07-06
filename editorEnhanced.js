@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.12
+// @version      0.13
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -170,10 +170,10 @@
 
   function formtNewsInformation (parentSelector) {
     const parent = document.querySelector(parentSelector)
-    const keywordsRegex  = /( |,|，|、)+(宿房网|宿州市)/g;
-    const titleRegex = / +\||\||\| +/g;
+    const keywordsRegex  = /(\s|,|，|、)+(宿房网|宿州市)/g;
+    const titleRegex = /\s+\||\||\|\s+/g;
     const moreBlankRegex = /\s+/g;
-    const noneNecessarySymbol =/ |，|、/g;
+    const noneNecessarySymbol =/\s|，|、/g;
     const title = parent.querySelector("[placeholder='请输入标题']");
     const keywords = parent.querySelector("[placeholder='请输入关键词']");
     const description = parent.querySelector("[placeholder='请输入摘要']");
@@ -181,7 +181,7 @@
     const seoKeywords = parent.querySelector("[placeholder='请输入seo关键词']");
     const seoDescription = parent.querySelector("[placeholder='请输入seo描述']");
     const titleX = title.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
-    const keywordsX = keywords.value.replace(keywordsRegex,"").replace(noneNecessarySymbol, ",");
+    const keywordsX = keywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex,"").replace(noneNecessarySymbol, ",");
     const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, " ").replace(keywordsRegex,"")
     const seoTitleX = seoTitle.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
     const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex,"").replace(noneNecessarySymbol, ",");

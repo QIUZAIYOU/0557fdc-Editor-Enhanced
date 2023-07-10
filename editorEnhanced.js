@@ -47,7 +47,7 @@
     subtree: true
   });
   // 工具类函数
-  function setInputValue (element, value) {
+  function setInputValue(element, value) {
     element.value = value;
     element.dispatchEvent(new Event("input", {
       bubbles: false,
@@ -55,13 +55,13 @@
     }));
   }
 
-  function htmlToNode (htmlString) {
+  function htmlToNode(htmlString) {
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlString.trim();
     return tempDiv;
   };
 
-  function appendHTMLString (parentSelector, htmlString) {
+  function appendHTMLString(parentSelector, htmlString) {
     const parentDom = document.querySelector(parentSelector);
     if (parentDom ?? false) {
       const tempDiv = document.createElement("div");
@@ -71,7 +71,7 @@
     }
   }
 
-  function getButtonByText (parentSelector, selfSelector, childSelector, text) {
+  function getButtonByText(parentSelector, selfSelector, childSelector, text) {
     const parentDom = document.querySelector(parentSelector);
     const allButtons = parentDom.querySelectorAll(selfSelector);
     let targetButton;
@@ -88,17 +88,17 @@
     return targetButton || null;
   }
 
-  function createButton (id, label, title, svgContent, style = "") {
+  function createButton(id, label, title, svgContent, width = 24, height = 24, style = "") {
     return `<button id="${id}" class="tox-tbtn" aria-label="${label}" title="${title}" type="button" tabindex="-1" aria-disabled="false" style="${style}">
       <span class="tox-icon tox-tbtn__icon-wrap">
-        <svg class="icon" viewBox="0 0 1024 1024" width="24" height="24">
+        <svg class="icon" viewBox="0 0 1024 1024" width="${width}" height="${height}">
           ${svgContent}
         </svg>
       </span>
     </button>`;
   }
 
-  function copyToClipboard (txt) {
+  function copyToClipboard(txt) {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(txt).then(function () {
         alert("复制成功！");
@@ -116,19 +116,18 @@
   // 执行类函数
   const inlineElement = ["SPAN", "STRONG", "EM"]
 
-  function formtNewsContentSetting () {
+  function formtNewsContentSetting() {
     const editor_iframe = document.querySelector(".tox-edit-area>iframe").contentWindow.document.querySelector("#tinymce")
     const newsTextarea = document.querySelector(".tox-form textarea.tox-textarea");
     let newsHTML = newsTextarea.value;
     const virtualElement = createVirtualElement(newsHTML);
-    const clearedHtml = removeAllIdAndClassAndDataAttrs(virtualElement)
-    editor_iframe.innerHTML = clearedHtml.innerHTML;
+    const clearedHtml = removeAllIdAndClassAndDataAttrs(virtualElement);
     newsTextarea.value = clearedHtml.innerHTML;
-    const removeAllEmptyParagraphsButton = createButton("removeAllEmptyParagraphsButton", "清除空段", "清除空段", `<path d="M328.832 496.939l-151.467-80.811a17.067 17.067 0 0 1 13.398-31.275l217.642 72.278-79.573 39.808zm214.4 114.346l155.179-57.898 96.554 32.085h-.085a149.376 149.376 0 0 1-48.213 290.73A149.333 149.333 0 0 1 617.94 651.137l-74.666-39.85zm203.435 51.627a64 64 0 1 0 0 128 64 64 0 0 0 0-128z" opacity=".3"/><path d="M746.667 384a64 64 0 1 0 0-128 64 64 0 0 0 0 128zM617.94 395.776a149.333 149.333 0 1 1 176.939 65.621h.085L190.72 662.016a17.067 17.067 0 0 1-13.397-31.275l440.576-234.965z"/>`, "margin:0")
-    const removeBackgroundButton = createButton("removeBackgroundButton", "清除背景图片", "清除背景图片", `<path d="M728.363 313.301l-60.331-60.288L517.12 403.797l60.373 60.374L728.32 313.3zm90.496 30.166L215.467 946.859a42.667 42.667 0 0 1-60.331 0L34.475 826.197a42.667 42.667 0 0 1 0-60.33l603.392-603.392a42.667 42.667 0 0 1 60.33 0L818.86 283.136a42.667 42.667 0 0 1 0 60.33z"/><path d="M746.667 512h42.666a21.333 21.333 0 0 1 21.334 21.333V576a21.333 21.333 0 0 1-21.334 21.333h-42.666A21.333 21.333 0 0 1 725.333 576v-42.667A21.333 21.333 0 0 1 746.667 512zm128-128h42.666a21.333 21.333 0 0 1 21.334 21.333V448a21.333 21.333 0 0 1-21.334 21.333h-42.666A21.333 21.333 0 0 1 853.333 448v-42.667A21.333 21.333 0 0 1 874.667 384zm42.666 170.667H960A21.333 21.333 0 0 1 981.333 576v42.667A21.333 21.333 0 0 1 960 640h-42.667A21.333 21.333 0 0 1 896 618.667V576a21.333 21.333 0 0 1 21.333-21.333z" opacity=".3"/>`)
-    const handleImageStyleButton = createButton("handleImageStyleButton", "图片处理", "图片处理(仅适用于简单排版)", `<path d="M256 213.333h512a128 128 0 0 1 128 128v384a128 128 0 0 1-128 128H256a128 128 0 0 1-128-128v-384a128 128 0 0 1 128-128zm-42.667 512h384l-192-256-192 256zm469.334-128a128 128 0 1 0 0-256 128 128 0 0 0 0 256z"/>`)
-    const insertBlankElementButton = createButton("insertBlankElementButton", "插入空段", "插入空段", `<path d="M490.667 213.333h298.666a64 64 0 0 1 0 128H490.667a64 64 0 0 1 0-128zm-256 512h554.666a64 64 0 0 1 0 128H234.667a64 64 0 0 1 0-128zm0-256h554.666a64 64 0 0 1 0 128H234.667a64 64 0 0 1 0-128z" opacity=".3"/><path d="M206.037 401.408L328.661 294.4a21.333 21.333 0 0 0 .086-32.128L206.08 154.624a21.333 21.333 0 0 0-35.413 16.043V385.28a21.333 21.333 0 0 0 35.37 16.128z"/>`)
-    const adjustLineHeightButton = createButton("adjustLineHeightButton", "调整行高", "调整行高", `<path d="M85.333 490.667a64 64 0 0 0 64 64h725.334a64 64 0 0 0 0-128H149.333a64 64 0 0 0-64 64z"/><path d="M405.333 853.333a64 64 0 0 1 0-128h469.334a64 64 0 0 1 0 128H405.333zm256-597.333a64 64 0 0 1 0-128h213.334a64 64 0 0 1 0 128H661.333z" opacity=".5"/>`)
+    const removeAllEmptyParagraphsButton = createButton("removeAllEmptyParagraphsButton", "清除空段", "清除空段", `<path fill="#222f3e" d="M603.392 223.701a85.333 85.333 0 0 0-120.661 0l-50.944 50.859a42.667 42.667 0 0 0 0 60.33l271.53 271.531 81.067-81.066a85.333 85.333 0 0 0 0-120.662L603.349 223.701zM482.731 827.093l160.298-160.341-301.696-301.653a85.333 85.333 0 0 1 0-120.747l81.067-81.024a170.667 170.667 0 0 1 241.323 0L844.8 344.363a170.667 170.667 0 0 1 0 241.365L577.152 853.333h276.181a42.667 42.667 0 1 1 0 85.334h-384a42.496 42.496 0 0 1-17.578-3.798 170.453 170.453 0 0 1-150.102-47.402L120.62 706.432a170.667 170.667 0 0 1 0-241.365l100.01-99.968a42.667 42.667 0 1 1 60.331 60.373l-99.968 99.968a85.333 85.333 0 0 0 0 120.661l180.992 181.035a85.333 85.333 0 0 0 120.704 0z"/>`, 24, 24, "margin:0")
+    const removeBackgroundButton = createButton("removeBackgroundButton", "清除背景图片", "清除背景图片", `<path fill="#222f3e" d="M512 1023.998A511.999 511.999 0 0 1 312.61 41.08a511.999 511.999 0 0 1 398.78 942.84A508.993 508.993 0 0 1 512 1023.998zm0-943.842C273.535 80.156 80.157 274.536 80.157 512S273.535 943.842 512 943.842s431.843-193.378 431.843-431.843S749.463 80.156 512 80.156z"/><path fill="#222f3e" d="M320.627 743.45a40.078 40.078 0 0 1-28.055-68.132l381.745-381.745a40.384 40.384 0 0 1 57.111 57.111L349.683 731.427a40.078 40.078 0 0 1-29.056 12.024z"/><path fill="#222f3e" d="M702.371 743.45a40.078 40.078 0 0 1-28.054-12.023L292.572 349.682a40.384 40.384 0 0 1 57.111-57.111l380.743 382.747a40.078 40.078 0 0 1-28.055 68.133z"/>`, 22, 22)
+    const handleImageStyleButton = createButton("handleImageStyleButton", "图片处理", "图片处理(仅适用于简单排版)", `<path fill="#222f3e" d="M368 480c-62.4 0-112-49.6-112-112s49.6-112 112-112 112 49.6 112 112-49.6 112-112 112zm0-160c-27.2 0-48 20.8-48 48s20.8 48 48 48 48-20.8 48-48-20.8-48-48-48zm464 608H192c-52.8 0-96-43.2-96-96V192c0-52.8 43.2-96 96-96h640c52.8 0 96 43.2 96 96v640c0 52.8-43.2 96-96 96zM192 160c-17.6 0-32 14.4-32 32v640c0 17.6 14.4 32 32 32h640c17.6 0 32-14.4 32-32V192c0-17.6-14.4-32-32-32H192zm259.2 556.8c-25.6 0-51.2-11.2-70.4-30.4l-38.4-40c-12.8-12.8-33.6-12.8-46.4 0l-49.6 52.8c-12.8 12.8-32 12.8-44.8 1.6s-12.8-32-1.6-44.8l49.6-52.8c17.6-19.2 43.2-30.4 68.8-30.4s51.2 11.2 70.4 30.4l38.4 40c12.8 12.8 33.6 12.8 46.4 0l160-168c17.6-19.2 43.2-30.4 70.4-30.4s51.2 11.2 70.4 30.4L920 628.8c12.8 12.8 11.2 33.6-1.6 44.8-12.8 12.8-33.6 11.2-44.8-1.6L728 518.4c-12.8-12.8-33.6-12.8-46.4 0L521.6 688c-19.2 17.6-44.8 28.8-70.4 28.8z"/>`)
+    const insertBlankElementButton = createButton("insertBlankElementButton", "插入空段", "插入空段", `<path fill="#222f3e" d="M871.32 559.104c35.674 0 64.594 28.71 64.594 64.138v248.534c0 35.422-28.92 64.138-64.595 64.138H152.681c-35.675 0-64.595-28.716-64.595-64.138V623.242c0-35.427 28.92-64.138 64.595-64.138h718.638zm3.638 60.95H154.58V869.42h720.378V620.054zm-523.66 72.038a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zm160.702 0a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zm160.702 0a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zM871.319 88.086c35.675 0 64.595 28.942 64.595 64.65v258.598c0 35.703-28.92 64.65-64.595 64.65H152.681c-35.675 0-64.595-28.947-64.595-64.65V152.736c0-35.708 28.92-64.65 64.595-64.65h718.638zm3.64 60.956H154.58v260.442h720.378V149.042zm-523.66 77.576a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zm160.701 0a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zm160.702 0a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29z" data-spm-anchor-id="a313x.7781069.0.i13"/>`)
+    const adjustLineHeightButton = createButton("adjustLineHeightButton", "调整行高", "调整行高", `<path fill="#222f3e" d="M256 298.667v170.666h-85.333V298.667h-128L213.333 128 384 298.667H256zm213.39-128h426.667V256H469.39v-85.333zm426.667 298.666h-512v85.334h512v-85.334zM384 725.333H256V554.667h-85.333v170.666h-128L213.333 896 384 725.333zM469.39 768h426.667v85.333H469.39V768z" class="selected" data-spm-anchor-id="a313x.7781069.0.i14"/>`)
     appendHTMLString(".tox-dialog__footer-start", removeAllEmptyParagraphsButton)
     appendHTMLString(".tox-dialog__footer-start", removeBackgroundButton)
     appendHTMLString(".tox-dialog__footer-start", handleImageStyleButton)
@@ -137,41 +136,36 @@
     document.getElementById("removeAllEmptyParagraphsButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = removeAllEmptyParagraphs(domElement)
-      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
     document.getElementById("removeBackgroundButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = removeBackgroundImage(domElement)
-      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
     document.getElementById("handleImageStyleButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = handleImageStyleIssues(domElement)
-      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
     document.getElementById("insertBlankElementButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = insertBlankElementBetweenPAndSection(domElement)
-      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
     document.getElementById("adjustLineHeightButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = adjustLineHeight(domElement)
-      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
   }
 
-  function formtNewsInformation (parentSelector) {
+  function formtNewsInformation(parentSelector) {
     const parent = document.querySelector(parentSelector)
-    const keywordsRegex  = /(\s|,|，|、)+(宿房网|宿州市)/g;
+    const keywordsRegex = /(\s|,|，|、)+(宿房网|宿州市)/g;
     const titleRegex = /\s+\||\||\|\s+/g;
     const moreBlankRegex = /\s+/g;
-    const noneNecessarySymbol =/\s|，|、/g;
+    const noneNecessarySymbol = /\s|，|、/g;
     const title = parent.querySelector("[placeholder='请输入标题']");
     const keywords = parent.querySelector("[placeholder='请输入关键词']");
     const description = parent.querySelector("[placeholder='请输入摘要']");
@@ -179,41 +173,41 @@
     const seoKeywords = parent.querySelector("[placeholder='请输入seo关键词']");
     const seoDescription = parent.querySelector("[placeholder='请输入seo描述']");
     const titleX = title.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
-    const keywordsX = keywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex,"").replace(noneNecessarySymbol, ",");
-    const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, " ").replace(keywordsRegex,"")
+    const keywordsX = keywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex, "").replace(noneNecessarySymbol, ",");
+    const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "")
     const seoTitleX = seoTitle.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
-    const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex,"").replace(noneNecessarySymbol, ",");
-    const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex,"")
+    const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex, "").replace(noneNecessarySymbol, ",");
+    const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "")
     const numberInput = parent.querySelector("input.number-input[type='number']")
     const editor_iframe = parent.querySelector(".tox-edit-area>iframe").contentWindow.document.querySelector("#tinymce")
     setInputValue(title, `${titleX}`);
     setInputValue(keywords, `${keywordsX}`);
     setInputValue(description, `${descriptionX}`);
     setInputValue(seoTitle, `${seoTitleX}`);
-    if(keywordsRegex.test(seoKeywords)){
+    if (keywordsRegex.test(seoKeywords)) {
       setInputValue(seoKeywords, `${seoKeywordsX}`);
-    }else{
+    } else {
       setInputValue(seoKeywords, `${seoKeywordsX},宿州市,宿房网`);
     }
     setInputValue(seoDescription, `${seoDescriptionX}`);
-    if(editor_iframe.innerHTML.includes('<img')) setInputValue(numberInput, 1);
+    if (editor_iframe.innerHTML.includes('<img')) setInputValue(numberInput, 1);
     const yesButton = getButtonByText(".el-radio-group", ".el-radio", "span", "是")
     yesButton.click();
   }
 
-  function decodeHTMLEntities (text) {
+  function decodeHTMLEntities(text) {
     const textArea = document.createElement("textarea");
     textArea.innerHTML = text;
     return textArea.value;
   }
 
-  function createVirtualElement (dom) {
+  function createVirtualElement(dom) {
     const tempDiv = document.createElement("div")
     tempDiv.innerHTML = dom
     return tempDiv
   }
 
-  function removeAllEmptyParagraphs (dom) {
+  function removeAllEmptyParagraphs(dom) {
     const cloneDom = dom.cloneNode(true)
     const elements = cloneDom.querySelectorAll("p,section,span,strong");
     if (elements.length > 0) {
@@ -231,7 +225,7 @@
     return cloneDom;
   }
 
-  function removeBackgroundImage (dom) {
+  function removeBackgroundImage(dom) {
     const cloneDom = dom.cloneNode(true)
     const elements = cloneDom.querySelectorAll("*");
     for (let currentElement of elements) {
@@ -247,7 +241,7 @@
     return cloneDom;
   }
 
-  function adjustLineHeight (dom) {
+  function adjustLineHeight(dom) {
     const clonedDom = dom.cloneNode(true);
     const elements = clonedDom.getElementsByTagName("*");
     for (let currentElement of elements) {
@@ -262,23 +256,23 @@
     return clonedDom;
   }
 
-  function insertBlankElementBetweenPAndSection (dom) {
-    function isRootElement (element) {
+  function insertBlankElementBetweenPAndSection(dom) {
+    function isRootElement(element) {
       return element.parentNode === element.ownerDocument.documentElement;
     }
 
-    function isLastElement (element, parent) {
+    function isLastElement(element, parent) {
       return element === parent.lastElementChild;
     }
 
-    function createBlankDiv () {
+    function createBlankDiv() {
       const div = document.createElement("div");
       div.style.height = "15px";
       div.classList.add("use-for-blank");
       return div;
     }
 
-    function removeDuplicateBlankDivs (parent) {
+    function removeDuplicateBlankDivs(parent) {
       const divs = parent.querySelectorAll("div.use-for-blank");
       for (let div of divs) {
         if (div.previousElementSibling.classList.contains("use-for-blank")) {
@@ -300,7 +294,7 @@
     return cloneDom;
   }
 
-  function removeAllIdAndClassAndDataAttrs (dom) {
+  function removeAllIdAndClassAndDataAttrs(dom) {
     const cloneDom = dom.cloneNode(true)
     const elements = cloneDom.querySelectorAll("*");
     for (let currentElement of elements) {
@@ -319,7 +313,7 @@
     }
     return cloneDom;
   }
-  function insertImgToAncestor (dom) {
+  function insertImgToAncestor(dom) {
     const clonedDom = dom.cloneNode(true);
     const targetDom = clonedDom.querySelectorAll("p,section");
     const imgElements = clonedDom.querySelectorAll('img:only-child')
@@ -336,7 +330,7 @@
     }
     return clonedDom;
   }
-  function handleImageStyleIssues (dom) {
+  function handleImageStyleIssues(dom) {
     const cloneDom = dom.cloneNode(true)
     // cloneDom = insertImgToAncestor(cloneDom)
     const imgElements = cloneDom.querySelectorAll("img");

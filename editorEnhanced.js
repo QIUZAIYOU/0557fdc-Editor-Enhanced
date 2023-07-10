@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.13
+// @version      0.14
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -117,14 +117,12 @@
   const inlineElement = ["SPAN", "STRONG", "EM"]
 
   function formtNewsContentSetting () {
-    const iframe = document.querySelector(".tox-edit-area>iframe");
-    const tinymceDocument = iframe.contentWindow.document;
-    const tinymceArea = tinymceDocument.querySelector("#tinymce")
+    const editor_iframe = document.querySelector(".tox-edit-area>iframe").contentWindow.document.querySelector("#tinymce")
     const newsTextarea = document.querySelector(".tox-form textarea.tox-textarea");
     let newsHTML = newsTextarea.value;
     const virtualElement = createVirtualElement(newsHTML);
     const clearedHtml = removeAllIdAndClassAndDataAttrs(virtualElement)
-    tinymceArea.value = clearedHtml.innerHTML;
+    editor_iframe.innerHTML = clearedHtml.innerHTML;
     newsTextarea.value = clearedHtml.innerHTML;
     const removeAllEmptyParagraphsButton = createButton("removeAllEmptyParagraphsButton", "清除空段", "清除空段", `<path d="M328.832 496.939l-151.467-80.811a17.067 17.067 0 0 1 13.398-31.275l217.642 72.278-79.573 39.808zm214.4 114.346l155.179-57.898 96.554 32.085h-.085a149.376 149.376 0 0 1-48.213 290.73A149.333 149.333 0 0 1 617.94 651.137l-74.666-39.85zm203.435 51.627a64 64 0 1 0 0 128 64 64 0 0 0 0-128z" opacity=".3"/><path d="M746.667 384a64 64 0 1 0 0-128 64 64 0 0 0 0 128zM617.94 395.776a149.333 149.333 0 1 1 176.939 65.621h.085L190.72 662.016a17.067 17.067 0 0 1-13.397-31.275l440.576-234.965z"/>`, "margin:0")
     const removeBackgroundButton = createButton("removeBackgroundButton", "清除背景图片", "清除背景图片", `<path d="M728.363 313.301l-60.331-60.288L517.12 403.797l60.373 60.374L728.32 313.3zm90.496 30.166L215.467 946.859a42.667 42.667 0 0 1-60.331 0L34.475 826.197a42.667 42.667 0 0 1 0-60.33l603.392-603.392a42.667 42.667 0 0 1 60.33 0L818.86 283.136a42.667 42.667 0 0 1 0 60.33z"/><path d="M746.667 512h42.666a21.333 21.333 0 0 1 21.334 21.333V576a21.333 21.333 0 0 1-21.334 21.333h-42.666A21.333 21.333 0 0 1 725.333 576v-42.667A21.333 21.333 0 0 1 746.667 512zm128-128h42.666a21.333 21.333 0 0 1 21.334 21.333V448a21.333 21.333 0 0 1-21.334 21.333h-42.666A21.333 21.333 0 0 1 853.333 448v-42.667A21.333 21.333 0 0 1 874.667 384zm42.666 170.667H960A21.333 21.333 0 0 1 981.333 576v42.667A21.333 21.333 0 0 1 960 640h-42.667A21.333 21.333 0 0 1 896 618.667V576a21.333 21.333 0 0 1 21.333-21.333z" opacity=".3"/>`)
@@ -139,31 +137,31 @@
     document.getElementById("removeAllEmptyParagraphsButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = removeAllEmptyParagraphs(domElement)
-      tinymceArea.value = result.innerHTML;
+      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
     document.getElementById("removeBackgroundButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = removeBackgroundImage(domElement)
-      tinymceArea.value = result.innerHTML;
+      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
     document.getElementById("handleImageStyleButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = handleImageStyleIssues(domElement)
-      tinymceArea.value = result.innerHTML;
+      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
     document.getElementById("insertBlankElementButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = insertBlankElementBetweenPAndSection(domElement)
-      tinymceArea.value = result.innerHTML;
+      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
     document.getElementById("adjustLineHeightButton").addEventListener("click", () => {
       const domElement = htmlToNode(newsTextarea.value)
       const result = adjustLineHeight(domElement)
-      tinymceArea.value = result.innerHTML;
+      editor_iframe.innerHTML = result.innerHTML;
       newsTextarea.value = result.innerHTML;
     })
   }
@@ -186,6 +184,8 @@
     const seoTitleX = seoTitle.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
     const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex,"").replace(noneNecessarySymbol, ",");
     const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex,"")
+    const numberInput = parent.querySelector("input.number-input[type='number']")
+    const editor_iframe = parent.querySelector(".tox-edit-area>iframe").contentWindow.document.querySelector("#tinymce")
     setInputValue(title, `${titleX}`);
     setInputValue(keywords, `${keywordsX}`);
     setInputValue(description, `${descriptionX}`);
@@ -196,6 +196,7 @@
       setInputValue(seoKeywords, `${seoKeywordsX},宿州市,宿房网`);
     }
     setInputValue(seoDescription, `${seoDescriptionX}`);
+    if(editor_iframe.innerHTML.includes('<img')) setInputValue(numberInput, 1);
     const yesButton = getButtonByText(".el-radio-group", ".el-radio", "span", "是")
     yesButton.click();
   }

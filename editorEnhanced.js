@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.15
+// @version      0.17
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -31,10 +31,18 @@
             formtNewsContentSetting()
           }
           if (node.classList && node.classList.contains("tox-tinymce") && !isAdded()) {
-            const newsSaveButton = getButtonByText(".el-dialog", ".el-button", "span", "保存")
-            newsSaveButton.addEventListener("click", () => {
-              formtNewsInformation("[role='dialog']")
-            }, true)
+            const newsSaveButton = getButtonByText(".el-dialog", ".el-button", "span", "保存");
+            const newsSubmitButton = getButtonByText(".el-dialog", ".el-button", "span", "提交");
+            if (newsSaveButton) {
+              newsSaveButton.addEventListener("click", () => {
+                formtNewsInformation("[role='dialog']")
+              }, true)
+            }
+            if (newsSubmitButton) {
+              newsSubmitButton.addEventListener("click", () => {
+                formtNewsInformation("[role='dialog']")
+              }, true)
+            }
           }
         }
       }

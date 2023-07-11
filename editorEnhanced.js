@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.18
+// @version      0.19
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -121,6 +121,13 @@
       alert("浏览器不支持复制到剪贴板！");
     }
   }
+  function convertStringToArrayAndRemoveDuplicates(str,addon) {
+    const fullStr = `${str},${addon}`
+    const arr = fullStr.replace(/,+/g,",").split(',');
+    const uniqueSet = new Set(arr);
+    const newStr = Array.from(uniqueSet).join(',');
+    return newStr;
+  }
   // 执行类函数
   const inlineElement = ["SPAN", "STRONG", "EM"]
 
@@ -184,7 +191,7 @@
     const keywordsX = keywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex, "").replace(noneNecessarySymbol, ",");
     const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "")
     const seoTitleX = seoTitle.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
-    const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex, "").replace(noneNecessarySymbol, ",");
+    const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(noneNecessarySymbol, ",");
     const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "");
     const numberInput = parent.querySelector("input.number-input[type='number']")
     const editor_iframe = parent.querySelector(".tox-edit-area>iframe").contentWindow.document.querySelector("#tinymce");
@@ -194,13 +201,7 @@
     setInputValue(keywords, `${keywordsX}`);
     setInputValue(description, `${descriptionX}`);
     setInputValue(seoTitle, `${seoTitleX}`);
-    if (keywordsRegex.test(seoKeywords)) {
-      setInputValue(seoKeywords, `${seoKeywordsX}`);
-    } else if (seoKeywords.value === "") {
-      setInputValue(seoKeywords, `宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`);
-    } else {
-      setInputValue(seoKeywords, `${seoKeywordsX},宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`);
-    }
+    setInputValue(seoKeywords, convertStringToArrayAndRemoveDuplicates(seoKeywordsX,`宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`));
     setInputValue(seoDescription, `${seoDescriptionX}`);
     if (!thumb && editor_iframe.innerHTML.includes("<img")) setInputValue(numberInput, 1);
     const yesButton = getButtonByText(".el-radio-group", ".el-radio", "span", "是")

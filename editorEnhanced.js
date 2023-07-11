@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.17
+// @version      0.18
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -185,20 +185,24 @@
     const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "")
     const seoTitleX = seoTitle.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
     const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex, "").replace(noneNecessarySymbol, ",");
-    const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "")
+    const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "");
     const numberInput = parent.querySelector("input.number-input[type='number']")
-    const editor_iframe = parent.querySelector(".tox-edit-area>iframe").contentWindow.document.querySelector("#tinymce")
+    const editor_iframe = parent.querySelector(".tox-edit-area>iframe").contentWindow.document.querySelector("#tinymce");
+    const thumb = parent.querySelector('.el-image__inner');
+    const year = new Date().getFullYear();
     setInputValue(title, `${titleX}`);
     setInputValue(keywords, `${keywordsX}`);
     setInputValue(description, `${descriptionX}`);
     setInputValue(seoTitle, `${seoTitleX}`);
     if (keywordsRegex.test(seoKeywords)) {
       setInputValue(seoKeywords, `${seoKeywordsX}`);
+    } else if (seoKeywords.value === "") {
+      setInputValue(seoKeywords, `宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`);
     } else {
-      setInputValue(seoKeywords, `${seoKeywordsX},宿州市,宿房网`);
+      setInputValue(seoKeywords, `${seoKeywordsX},宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`);
     }
     setInputValue(seoDescription, `${seoDescriptionX}`);
-    if (editor_iframe.innerHTML.includes('<img')) setInputValue(numberInput, 1);
+    if (!thumb && editor_iframe.innerHTML.includes("<img")) setInputValue(numberInput, 1);
     const yesButton = getButtonByText(".el-radio-group", ".el-radio", "span", "是")
     yesButton.click();
   }

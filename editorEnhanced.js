@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.19
+// @version      0.20
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -121,9 +121,9 @@
       alert("浏览器不支持复制到剪贴板！");
     }
   }
-  function convertStringToArrayAndRemoveDuplicates(str,addon) {
+  function convertStringToArrayAndRemoveDuplicates(str, addon) {
     const fullStr = `${str},${addon}`
-    const arr = fullStr.replace(/,+/g,",").split(',');
+    const arr = fullStr.replace(/,+/g, ",").split(',');
     const uniqueSet = new Set(arr);
     const newStr = Array.from(uniqueSet).join(',');
     return newStr;
@@ -182,16 +182,16 @@
     const moreBlankRegex = /\s+/g;
     const noneNecessarySymbol = /\s|，|、/g;
     const title = parent.querySelector("[placeholder='请输入标题']");
-    const keywords = parent.querySelector("[placeholder='请输入关键词']");
-    const description = parent.querySelector("[placeholder='请输入摘要']");
-    const seoTitle = parent.querySelector("[placeholder='请输入seo标题']");
-    const seoKeywords = parent.querySelector("[placeholder='请输入seo关键词']");
-    const seoDescription = parent.querySelector("[placeholder='请输入seo描述']");
     const titleX = title.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
+    const keywords = parent.querySelector("[placeholder='请输入关键词']");
     const keywordsX = keywords.value.replace(moreBlankRegex, " ").replace(keywordsRegex, "").replace(noneNecessarySymbol, ",");
+    const description = parent.querySelector("[placeholder='请输入摘要']");
     const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "")
+    const seoTitle = parent.querySelector("[placeholder='请输入seo标题']");
     const seoTitleX = seoTitle.value.replace(moreBlankRegex, "").replace(titleRegex, "丨");
+    const seoKeywords = parent.querySelector("[placeholder='请输入seo关键词']");
     const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, " ").replace(noneNecessarySymbol, ",");
+    const seoDescription = parent.querySelector("[placeholder='请输入seo描述']");
     const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, " ").replace(keywordsRegex, "");
     const numberInput = parent.querySelector("input.number-input[type='number']")
     const editor_iframe = parent.querySelector(".tox-edit-area>iframe").contentWindow.document.querySelector("#tinymce");
@@ -201,7 +201,7 @@
     setInputValue(keywords, `${keywordsX}`);
     setInputValue(description, `${descriptionX}`);
     setInputValue(seoTitle, `${seoTitleX}`);
-    setInputValue(seoKeywords, convertStringToArrayAndRemoveDuplicates(seoKeywordsX,`宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`));
+    setInputValue(seoKeywords, convertStringToArrayAndRemoveDuplicates(seoKeywordsX, `宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`));
     setInputValue(seoDescription, `${seoDescriptionX}`);
     if (!thumb && editor_iframe.innerHTML.includes("<img")) setInputValue(numberInput, 1);
     const yesButton = getButtonByText(".el-radio-group", ".el-radio", "span", "是")

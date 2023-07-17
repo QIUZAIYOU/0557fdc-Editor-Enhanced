@@ -2,14 +2,14 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.25
+// @version      0.26
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
 // @icon         https://www.0557fdc.com/admin/favicon.ico
 // @grant        none
 // ==/UserScript==
-(function () {
+(function() {
   'use strict'
   // 选择要观察的节点
   const callback = (mutationsList, observer) => {
@@ -109,9 +109,9 @@
 
   function copyToClipboard(txt) {
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(txt).then(function () {
+      navigator.clipboard.writeText(txt).then(function() {
         alert('复制成功！')
-      }, function () {
+      }, function() {
         alert('复制失败！')
       })
     } else if (window.clipboardData) {
@@ -122,15 +122,29 @@
       alert('浏览器不支持复制到剪贴板！')
     }
   }
+
+  function replaceMultiple(str, options) {
+    let result = str
+    for (let i = 0; i < options.rules.length; i++) {
+      const rule = options.rules[i]
+      const target = options.targets[i]
+      result = result.replace(rule, target)
+    }
+    return result
+  }
+
   function convertStringToArrayAndRemoveDuplicates(str, addonStr) {
-    const moreBlankRegex = /\s+/g
-    const noneNecessarySymbol = /\s|，|、/g
-    const fullStr = `${str.replace(moreBlankRegex, ' ').replace(noneNecessarySymbol, ',')}${str ? ',' : ''}${addonStr}`
+    const replacements = {
+      rules: [/\s+/g, /\s|，|、/g],
+      targets: [' ', ',']
+    }
+    const fullStr = `${replaceMultiple(str, replacements)}${str ? ',' : ''}${addonStr}`
     const arr = fullStr.replace(/,+/g, ',').split(',')
     const uniqueSet = new Set(arr)
     const newStr = Array.from(uniqueSet).join(',')
     return newStr
   }
+
   function executeFunctionsSequentially(functions, input) {
     if (Array.isArray(functions)) {
       if (functions.length === 0) {
@@ -145,6 +159,7 @@
       return functions(input)
     }
   }
+
   function addEventListenerToButton(buttonId, handlerFunctionList, newsTextarea) {
     const button = document.getElementById(buttonId)
     button.addEventListener('click', () => {
@@ -153,6 +168,7 @@
       newsTextarea.value = result.innerHTML
     })
   }
+
   function appendCustomButton(button, buttonId, handlerFunctionList, newsTextarea) {
     appendHTMLString('.tox-dialog__footer-start', button)
     addEventListenerToButton(buttonId, handlerFunctionList, newsTextarea)
@@ -167,21 +183,18 @@
     const virtualElement = createVirtualElement(newsHTML)
     const clearedHtml = removeAllIdAndClassAndDataAttrs(virtualElement)
     newsTextarea.value = clearedHtml.innerHTML
-
     const uniformParagraphSpacingButton = createButton('uniformParagraphSpacingButton', '统一段间距', '统一段间距(15px)', '<path fill="#222f3e" d="M871.32 559.104c35.674 0 64.594 28.71 64.594 64.138v248.534c0 35.422-28.92 64.138-64.595 64.138H152.681c-35.675 0-64.595-28.716-64.595-64.138V623.242c0-35.427 28.92-64.138 64.595-64.138h718.638zm3.638 60.95H154.58V869.42h720.378V620.054zm-523.66 72.038a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zm160.702 0a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zm160.702 0a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zM871.319 88.086c35.675 0 64.595 28.942 64.595 64.65v258.598c0 35.703-28.92 64.65-64.595 64.65H152.681c-35.675 0-64.595-28.947-64.595-64.65V152.736c0-35.708 28.92-64.65 64.595-64.65h718.638zm3.64 60.956H154.58v260.442h720.378V149.042zm-523.66 77.576a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zm160.701 0a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29zm160.702 0a52.642 52.642 0 1 1 0 105.29 52.642 52.642 0 0 1 0-105.29z" data-spm-anchor-id="a313x.7781069.0.i13"/>', undefined, 24, 24, 'margin:0')
     const adjustLineHeightButton = createButton('adjustLineHeightButton', '调整行高', '调整行高(1.75)', '<path fill="#222f3e" d="M256 298.667v170.666h-85.333V298.667h-128L213.333 128 384 298.667H256zm213.39-128h426.667V256H469.39v-85.333zm426.667 298.666h-512v85.334h512v-85.334zM384 725.333H256V554.667h-85.333v170.666h-128L213.333 896 384 725.333zM469.39 768h426.667v85.333H469.39V768z" class="selected" data-spm-anchor-id="a313x.7781069.0.i14"/>')
     const removeBackgroundButton = createButton('removeBackgroundButton', '清除背景图片', '清除不显示的微信背景图片', '<path fill="#222f3e" d="M512 1023.998A511.999 511.999 0 0 1 312.61 41.08a511.999 511.999 0 0 1 398.78 942.84A508.993 508.993 0 0 1 512 1023.998zm0-943.842C273.535 80.156 80.157 274.536 80.157 512S273.535 943.842 512 943.842s431.843-193.378 431.843-431.843S749.463 80.156 512 80.156z"/><path fill="#222f3e" d="M320.627 743.45a40.078 40.078 0 0 1-28.055-68.132l381.745-381.745a40.384 40.384 0 0 1 57.111 57.111L349.683 731.427a40.078 40.078 0 0 1-29.056 12.024z"/><path fill="#222f3e" d="M702.371 743.45a40.078 40.078 0 0 1-28.054-12.023L292.572 349.682a40.384 40.384 0 0 1 57.111-57.111l380.743 382.747a40.078 40.078 0 0 1-28.055 68.133z"/>', undefined, 22, 22)
     const handleImageStyleButton = createButton('handleImageStyleButton', '图片处理', '图片处理(自动调整宽度650并居中，仅适用于简单排版)', '<path fill="#222f3e" d="M368 480c-62.4 0-112-49.6-112-112s49.6-112 112-112 112 49.6 112 112-49.6 112-112 112zm0-160c-27.2 0-48 20.8-48 48s20.8 48 48 48 48-20.8 48-48-20.8-48-48-48zm464 608H192c-52.8 0-96-43.2-96-96V192c0-52.8 43.2-96 96-96h640c52.8 0 96 43.2 96 96v640c0 52.8-43.2 96-96 96zM192 160c-17.6 0-32 14.4-32 32v640c0 17.6 14.4 32 32 32h640c17.6 0 32-14.4 32-32V192c0-17.6-14.4-32-32-32H192zm259.2 556.8c-25.6 0-51.2-11.2-70.4-30.4l-38.4-40c-12.8-12.8-33.6-12.8-46.4 0l-49.6 52.8c-12.8 12.8-32 12.8-44.8 1.6s-12.8-32-1.6-44.8l49.6-52.8c17.6-19.2 43.2-30.4 68.8-30.4s51.2 11.2 70.4 30.4l38.4 40c12.8 12.8 33.6 12.8 46.4 0l160-168c17.6-19.2 43.2-30.4 70.4-30.4s51.2 11.2 70.4 30.4L920 628.8c12.8 12.8 11.2 33.6-1.6 44.8-12.8 12.8-33.6 11.2-44.8-1.6L728 518.4c-12.8-12.8-33.6-12.8-46.4 0L521.6 688c-19.2 17.6-44.8 28.8-70.4 28.8z"/>')
     const addImageAlternativeDescriptionButton = createButton('addImageAlternativeDescriptionButton', '图片添加Alt', '图片添加Alt(如需自定义，先在编辑器里添加Alt后再使用此功能)', '<path d="M9 8.81a3.67 3.67 0 0 1-.15.63l-1.4 3.78h3.05L9.13 9.44A3.42 3.42 0 0 1 9 8.81z" fill="none"/><path d="M19.5 3.75h-15a.76.76 0 0 0-.75.75v15a.76.76 0 0 0 .75.75h15a.76.76 0 0 0 .75-.75v-15a.76.76 0 0 0-.75-.75zm-7.71 13l-.93-2.49H7.08l-.87 2.49h-1.3l3.46-9.1h1.26l3.45 9.08zm2.92 0h-1.15V7.13h1.15zm4.38-5.54h-1.62v3.54a1.55 1.55 0 0 0 .22.92.89.89 0 0 0 .72.27 1.14 1.14 0 0 0 .68-.21v.95a2.09 2.09 0 0 1-1 .21c-1.16 0-1.74-.65-1.74-1.93v-3.77h-1.13v-.94h1.11V8.69l1.14-.37v1.93h1.62z" fill="none"/><path d="M19.5 2.25h-15A2.25 2.25 0 0 0 2.25 4.5v15a2.25 2.25 0 0 0 2.25 2.25h15a2.25 2.25 0 0 0 2.25-2.25v-15a2.25 2.25 0 0 0-2.25-2.25zm.75 17.25a.76.76 0 0 1-.75.75h-15a.76.76 0 0 1-.75-.75v-15a.76.76 0 0 1 .75-.75h15a.76.76 0 0 1 .75.75z" fill="#222f3e"/><path d="M8.37 7.65l-3.46 9.08h1.3l.87-2.49h3.78l.93 2.49h1.29L9.63 7.65zm-.92 5.57l1.36-3.78A3.67 3.67 0 0 0 9 8.81a3.42 3.42 0 0 0 .14.63l1.37 3.78zM13.56 7.13h1.15v9.59h-1.15zM17.47 8.32l-1.14.37v1.56h-1.11v.94h1.11v3.75c0 1.28.58 1.93 1.74 1.93a2.09 2.09 0 0 0 1-.21v-.95a1.14 1.14 0 0 1-.68.21.89.89 0 0 1-.72-.27 1.55 1.55 0 0 1-.22-.92v-3.54h1.62v-.94h-1.6z" fill="#222f3e"/>', '0 0 24 24')
     const handelTableStyleButton = createButton('handelTableStyleButton', '处理表格', '处理表格(宽度自动100%，单元格添加5px内边距)', '<path fill="#222f3e" d="M959.825 384.002V191.94c0-70.692-57.308-128-128-128H191.94c-70.692 0-128 57.308-128 128v639.885c0 70.692 57.308 128 128 128h639.885c70.692 0 128-57.308 128-128V384.002zm-813.16-237.337a63.738 63.738 0 0 1 45.336-18.785H832a63.962 63.962 0 0 1 63.886 64.121v128.061H127.88v-128.06a63.738 63.738 0 0 1 18.785-45.337zm269.127 461.308v-223.97h192.181v223.97H415.792zm192.181 63.94v223.972H415.792V671.914h192.181zm-256.121-63.94H127.88v-223.97h223.972v223.97zM146.665 877.21a63.467 63.467 0 0 1-18.785-45.21V671.914h223.972v223.97h-159.85a63.626 63.626 0 0 1-45.337-18.675zm749.22-45.21a63.763 63.763 0 0 1-63.886 63.886H671.914V671.914h223.97v160.085zm0-224.026H671.914v-223.97h223.97v223.97z"/>', undefined, 22, 22)
-
     appendCustomButton(uniformParagraphSpacingButton, 'uniformParagraphSpacingButton', [removeAllEmptyParagraphs, insertBlankElementBetweenPAndSection], newsTextarea)
     appendCustomButton(adjustLineHeightButton, 'adjustLineHeightButton', adjustLineHeight, newsTextarea)
     appendCustomButton(removeBackgroundButton, 'removeBackgroundButton', removeBackgroundImage, newsTextarea)
     appendCustomButton(handleImageStyleButton, 'handleImageStyleButton', handleImageStyleIssues, newsTextarea)
     appendCustomButton(addImageAlternativeDescriptionButton, 'addImageAlternativeDescriptionButton', addImageAlternativeDescription, newsTextarea)
     appendCustomButton(handelTableStyleButton, 'handelTableStyleButton', handelTableStyleIssues, newsTextarea)
-
   }
 
   function formtNewsInformation(parentSelector) {
@@ -190,33 +203,46 @@
     const titleRegex = /\s+\||\||\|\s+/g
     const moreBlankRegex = /\s+/g
     const noneNecessarySymbol = /\s|，|、/g
+    const titleReplacements = {
+      rules: [moreBlankRegex, titleRegex],
+      targets: ['', '丨']
+    }
+    const keywordsReplacements = {
+      rules: [moreBlankRegex, keywordsRegex, noneNecessarySymbol],
+      targets: [' ', '', ',']
+    }
+    const seoKeywordsReplacements = {
+      rules: [moreBlankRegex, noneNecessarySymbol],
+      targets: [' ', ',']
+    }
+    const descriptionReplacements = {
+      rules: [moreBlankRegex, keywordsRegex],
+      targets: [' ', '']
+    }
     const title = parent.querySelector('[placeholder="请输入标题"]')
-    const titleX = title.value.replace(moreBlankRegex, '').replace(titleRegex, '丨')
+    const titleX = replaceMultiple(title.value, titleReplacements)
     const keywords = parent.querySelector('[placeholder="请输入关键词"]')
-    const keywordsX = keywords.value.replace(moreBlankRegex, ' ').replace(keywordsRegex, '').replace(noneNecessarySymbol, ',')
+    const keywordsX = replaceMultiple(keywords.value, keywordsReplacements)
     const description = parent.querySelector('[placeholder="请输入摘要"]')
-    const descriptionX = decodeHTMLEntities(description.value).replace(moreBlankRegex, ' ').replace(keywordsRegex, '')
+    const descriptionX = replaceMultiple(decodeHTMLEntities(description.value), descriptionReplacements)
     const seoTitle = parent.querySelector('[placeholder="请输入seo标题"]')
-    const seoTitleX = seoTitle.value.replace(moreBlankRegex, '').replace(titleRegex, '丨')
+    const seoTitleX = replaceMultiple(seoTitle.value, titleReplacements)
     const seoKeywords = parent.querySelector('[placeholder="请输入seo关键词"]')
-    const seoKeywordsX = seoKeywords.value.replace(moreBlankRegex, ' ').replace(noneNecessarySymbol, ',')
+    const seoKeywordsX = replaceMultiple(seoKeywords.value, seoKeywordsReplacements)
     const seoDescription = parent.querySelector('[placeholder="请输入seo描述"]')
-    const seoDescriptionX = decodeHTMLEntities(seoDescription.value).replace(moreBlankRegex, ' ').replace(keywordsRegex, '')
-
+    const seoDescriptionX = replaceMultiple(decodeHTMLEntities(seoDescription.value), descriptionReplacements)
     const numberInput = parent.querySelector('input.number-input[type="number"]')
     const editor_iframe = parent.querySelector('.tox-edit-area>iframe').contentWindow.document.querySelector('#tinymce')
     const thumb = parent.querySelector('.el-image__inner')
     const year = parent.querySelector('div.el-date-editor.el-input.el-input--small.el-input--prefix.el-input--suffix.el-date-editor--datetime > input').value.trim().slice(0, 4)
     // const addImageAlternativeDescriptionDom = addImageAlternativeDescription(htmlToNode(editor_iframe.innerHTML));
     // editor_iframe.innerHTML = addImageAlternativeDescriptionDom.innerHTML
-
     setInputValue(title, `${titleX}`)
     setInputValue(keywords, `${keywordsX}`)
     setInputValue(description, `${descriptionX}`)
     setInputValue(seoTitle, `${seoTitleX}`)
     setInputValue(seoKeywords, convertStringToArrayAndRemoveDuplicates(seoKeywordsX, `宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`))
     setInputValue(seoDescription, `${seoDescriptionX}`)
-
     if (!thumb && editor_iframe.innerHTML.includes('<img')) setInputValue(numberInput, 1)
     const yesButton = getButtonByText('.el-radio-group', '.el-radio', 'span', '是')
     yesButton.click()
@@ -340,11 +366,11 @@
     }
     return cloneDom
   }
+
   function insertImgToAncestor(dom) {
     const clonedDom = dom.cloneNode(true)
     const targetDom = clonedDom.querySelectorAll('p,section')
     const imgElements = clonedDom.querySelectorAll('img:only-child')
-
     for (let element of imgElements) {
       const clonedImg = element.cloneNode(true)
       let parent = element.parentNode
@@ -357,6 +383,7 @@
     }
     return clonedDom
   }
+
   function handleImageStyleIssues(dom) {
     const cloneDom = dom.cloneNode(true)
     const imgElements = cloneDom.querySelectorAll('img')
@@ -387,6 +414,7 @@
     }
     return cloneDom
   }
+
   function addImageAlternativeDescription(dom) {
     const cloneDom = dom.cloneNode(true)
     const imgElements = cloneDom.querySelectorAll('img')
@@ -400,6 +428,7 @@
     }
     return cloneDom
   }
+
   function handelTableStyleIssues(dom) {
     const cloneDom = dom.cloneNode(true)
     const tableElements = cloneDom.querySelectorAll('table')
@@ -412,7 +441,6 @@
         currentTd.width = ''
         currentTd.style.padding = '5px'
         currentTd.style.textAlign = 'center'
-
       }
       const spanElements = currentTable.querySelectorAll('span')
       for (let currentSpan of spanElements) {

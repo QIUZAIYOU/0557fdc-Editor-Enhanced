@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.26
+// @version      0.27
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -125,20 +125,22 @@
 
   function replaceMultiple(str, options) {
     let result = str
-    for (let i = 0; i < options.rules.length; i++) {
-      const rule = options.rules[i]
-      const target = options.targets[i]
-      result = result.replace(rule, target)
+    const {
+      regexs,
+      replacements
+    } = options
+    for (const i in regexs) {
+      result = result.replace(regexs[i], replacements[i])
     }
     return result
   }
 
   function convertStringToArrayAndRemoveDuplicates(str, addonStr) {
-    const replacements = {
-      rules: [/\s+/g, /\s|，|、/g],
-      targets: [' ', ',']
+    const replaceRegex = {
+      regexs: [/\s+/g, /\s|，|、/g],
+      replacements: [' ', ',']
     }
-    const fullStr = `${replaceMultiple(str, replacements)}${str ? ',' : ''}${addonStr}`
+    const fullStr = `${replaceMultiple(str, replaceRegex)}${str ? ',' : ''}${addonStr}`
     const arr = fullStr.replace(/,+/g, ',').split(',')
     const uniqueSet = new Set(arr)
     const newStr = Array.from(uniqueSet).join(',')
@@ -200,37 +202,37 @@
   function formtNewsInformation(parentSelector) {
     const parent = document.querySelector(parentSelector)
     const keywordsRegex = /(\s|,|，|、)+(宿房网|宿州市)/g
-    const titleRegex = /\s+\||\||\|\s+/g
+    const PipeSymbolRegex = /\s*\|\s*/g
     const moreBlankRegex = /\s+/g
     const noneNecessarySymbol = /\s|，|、/g
-    const titleReplacements = {
-      rules: [moreBlankRegex, titleRegex],
-      targets: ['', '丨']
+    const titleReplaceRegex = {
+      regexs: [moreBlankRegex, PipeSymbolRegex],
+      replacements: ['', '丨']
     }
-    const keywordsReplacements = {
-      rules: [moreBlankRegex, keywordsRegex, noneNecessarySymbol],
-      targets: [' ', '', ',']
+    const keywordsReplaceRegex = {
+      regexs: [moreBlankRegex, keywordsRegex, noneNecessarySymbol],
+      replacements: [' ', '', ',']
     }
-    const seoKeywordsReplacements = {
-      rules: [moreBlankRegex, noneNecessarySymbol],
-      targets: [' ', ',']
+    const seoKeywordsReplaceRegex = {
+      regexs: [moreBlankRegex, noneNecessarySymbol],
+      replacements: [' ', ',']
     }
-    const descriptionReplacements = {
-      rules: [moreBlankRegex, keywordsRegex],
-      targets: [' ', '']
+    const descriptionReplaceRegex = {
+      regexs: [moreBlankRegex, PipeSymbolRegex, keywordsRegex],
+      replacements: [' ', '丨', '']
     }
     const title = parent.querySelector('[placeholder="请输入标题"]')
-    const titleX = replaceMultiple(title.value, titleReplacements)
+    const titleX = replaceMultiple(title.value, titleReplaceRegex)
     const keywords = parent.querySelector('[placeholder="请输入关键词"]')
-    const keywordsX = replaceMultiple(keywords.value, keywordsReplacements)
+    const keywordsX = replaceMultiple(keywords.value, keywordsReplaceRegex)
     const description = parent.querySelector('[placeholder="请输入摘要"]')
-    const descriptionX = replaceMultiple(decodeHTMLEntities(description.value), descriptionReplacements)
+    const descriptionX = replaceMultiple(decodeHTMLEntities(description.value), descriptionReplaceRegex)
     const seoTitle = parent.querySelector('[placeholder="请输入seo标题"]')
-    const seoTitleX = replaceMultiple(seoTitle.value, titleReplacements)
+    const seoTitleX = replaceMultiple(seoTitle.value, titleReplaceRegex)
     const seoKeywords = parent.querySelector('[placeholder="请输入seo关键词"]')
-    const seoKeywordsX = replaceMultiple(seoKeywords.value, seoKeywordsReplacements)
+    const seoKeywordsX = replaceMultiple(seoKeywords.value, seoKeywordsReplaceRegex)
     const seoDescription = parent.querySelector('[placeholder="请输入seo描述"]')
-    const seoDescriptionX = replaceMultiple(decodeHTMLEntities(seoDescription.value), descriptionReplacements)
+    const seoDescriptionX = replaceMultiple(decodeHTMLEntities(seoDescription.value), descriptionReplaceRegex)
     const numberInput = parent.querySelector('input.number-input[type="number"]')
     const editor_iframe = parent.querySelector('.tox-edit-area>iframe').contentWindow.document.querySelector('#tinymce')
     const thumb = parent.querySelector('.el-image__inner')
@@ -262,11 +264,13 @@
 
   function removeAllEmptyParagraphs(dom) {
     const cloneDom = dom.cloneNode(true)
-    const elements = cloneDom.querySelectorAll('p,section,span,strong,em')
+    const elements = cloneDom.querySelectorAll('p,section,span,strong,em,td')
+    const blackList = ['TD']
     if (elements.length > 0) {
       for (let currentElement of elements) {
-        const currentElementHtml = currentElement.innerHTML.replace(/(&nbsp;)+/g, ' ').trim()
-        if (currentElementHtml === '&nbsp;' || currentElementHtml === '<br>' || currentElementHtml === '') {
+        const currentElementHtml = currentElement.innerHTML
+        currentElement.innerHTML = currentElementHtml.replace(/(&nbsp;)+/g, '').trim()
+        if (!blackList.includes(currentElement.nodeName) && (currentElementHtml === '&nbsp;' || currentElementHtml === '<br>' || currentElementHtml === '')) {
           currentElement.remove()
         }
       }
@@ -334,7 +338,7 @@
       }
     }
     const cloneDom = dom.cloneNode(true)
-    const elements = cloneDom.querySelectorAll('p, section')
+    const elements = cloneDom.querySelectorAll('p, section,table')
     for (let currentElement of elements) {
       const parent = currentElement.parentNode
       if (!isRootElement(currentElement) && !isLastElement(currentElement, parent)) {
@@ -432,8 +436,12 @@
   function handelTableStyleIssues(dom) {
     const cloneDom = dom.cloneNode(true)
     const tableElements = cloneDom.querySelectorAll('table')
+    const tableReplaceRegex = {
+      regexs: [/(<table\b[^>]*>)/gi, /(<\/table>)/gi],
+      replacements: ['<div style=\'overflow:auto\'>$1', '$1</div>']
+    }
     for (let currentTable of tableElements) {
-      currentTable.style.width = '100%'
+      currentTable.style.width = ''
       // currentTable.style.userSelect = 'none';
       const tdElements = currentTable.querySelectorAll('td')
       for (let currentTd of tdElements) {
@@ -447,6 +455,8 @@
         currentSpan.style.display = 'block'
       }
     }
+    const cloneDomHTML = cloneDom.innerHTML
+    cloneDom.innerHTML = replaceMultiple(cloneDomHTML, tableReplaceRegex)
     return cloneDom
   }
 })()

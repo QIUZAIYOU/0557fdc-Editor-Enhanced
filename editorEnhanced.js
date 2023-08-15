@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.28
+// @version      0.29
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -36,12 +36,12 @@
             const newsSubmitButton = getButtonByText('.el-dialog', '.el-button', 'span', '提交')
             if (newsSaveButton) {
               newsSaveButton.addEventListener('click', () => {
-                formtNewsInformation('[role="dialog"]')
+                formtNewsInformation('#formContainer')
               }, true)
             }
             if (newsSubmitButton) {
               newsSubmitButton.addEventListener('click', () => {
-                formtNewsInformation('[role="dialog"]')
+                formtNewsInformation('#formContainer')
               }, true)
             }
           }
@@ -56,7 +56,25 @@
     subtree: true
   })
   // 工具类函数
-  function setInputValue (element, value) {
+
+  function decodeHTMLEntities(text) {
+    const textArea = document.createElement('textarea')
+    textArea.innerHTML = text
+    return textArea.value
+  }
+
+  function htmlDecode(input) {
+    var doc = new DOMParser().parseFromString(input, "text/html")
+    return doc.documentElement.textContent
+  }
+
+  function createVirtualElement(dom) {
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = dom
+    return tempDiv
+  }
+
+  function setInputValue(element, value) {
     element.value = value
     element.dispatchEvent(new Event('input', {
       bubbles: false,
@@ -64,13 +82,13 @@
     }))
   }
 
-  function htmlToNode (htmlString) {
+  function htmlToNode(htmlString) {
     const tempDiv = document.createElement('div')
     tempDiv.innerHTML = htmlString.trim()
     return tempDiv
   }
 
-  function appendHTMLString (parentSelector, htmlString) {
+  function appendHTMLString(parentSelector, htmlString) {
     const parentDom = document.querySelector(parentSelector)
     if (parentDom ?? false) {
       const tempDiv = document.createElement('div')
@@ -80,7 +98,7 @@
     }
   }
 
-  function appendNewElement (nodeName, attrsOptions, style, parentSelector) {
+  function appendNewElement(nodeName, attrsOptions, style, parentSelector) {
     const newElement = document.createElement(nodeName)
     if (attrsOptions.id) newElement.id = attrsOptions.id
     if (attrsOptions.class) newElement.classList.add(attrsOptions.class)
@@ -88,7 +106,7 @@
     document.querySelector(parentSelector).appendChild(newElement)
   }
 
-  function getButtonByText (parentSelector, selfSelector, childSelector, text) {
+  function getButtonByText(parentSelector, selfSelector, childSelector, text) {
     const parentDom = document.querySelector(parentSelector)
     const allButtons = parentDom.querySelectorAll(selfSelector)
     let targetButton
@@ -105,7 +123,7 @@
     return targetButton || null
   }
 
-  function createButton (id, label, title, svgContent, viewBox = '0 0 1024 1024', width = 24, height = 24, style = '') {
+  function createButton(id, label, title, svgContent, viewBox = '0 0 1024 1024', width = 24, height = 24, style = '') {
     return `<button id="${id}" class="tox-tbtn" aria-label="${label}" title="${title}" type="button" tabindex="-1" aria-disabled="false" style="${style}">
       <span class="tox-icon tox-tbtn__icon-wrap">
         <svg class="icon" viewBox="${viewBox}" width="${width}" height="${height}">
@@ -115,7 +133,7 @@
     </button>`
   }
 
-  function copyToClipboard (txt) {
+  function copyToClipboard(txt) {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(txt).then(function () {
         alert('复制成功！')
@@ -131,7 +149,7 @@
     }
   }
 
-  function replaceMultiple (str, options) {
+  function replaceMultiple(str, options) {
     let result = str
     const {
       regexs,
@@ -143,7 +161,7 @@
     return result
   }
 
-  function convertStringToArrayAndRemoveDuplicates (str, addonStr) {
+  function convertStringToArrayAndRemoveDuplicates(str, addonStr) {
     const replaceRegex = {
       regexs: [/\s+/g, /\s|，|、/g],
       replacements: [' ', ',']
@@ -155,7 +173,7 @@
     return newStr
   }
 
-  function executeFunctionsSequentially (functions, input) {
+  function executeFunctionsSequentially(functions, input) {
     if (Array.isArray(functions)) {
       if (functions.length === 0) {
         return input // 返回最后一个函数的结果
@@ -170,7 +188,7 @@
     }
   }
 
-  function addEventListenerToButton (buttonId, handlerFunctionList, newsTextarea) {
+  function addEventListenerToButton(buttonId, handlerFunctionList, newsTextarea) {
     const button = document.getElementById(buttonId)
     button.addEventListener('click', () => {
       const domElement = htmlToNode(newsTextarea.value)
@@ -179,14 +197,18 @@
     })
   }
 
-  function appendCustomButton (button, buttonId, handlerFunctionList, newsTextarea, parentSelector = '#customButtonsWrapper') {
+  function appendCustomButton(button, buttonId, handlerFunctionList, newsTextarea, parentSelector = '#customButtonsWrapper') {
     appendHTMLString(parentSelector, button)
     addEventListenerToButton(buttonId, handlerFunctionList, newsTextarea)
+  }
+
+  function hasAnyClass(element, classes) {
+    return Array.from(element.classList).some(className => classes.includes(className));
   }
   // 执行类函数
   const inlineElement = ['SPAN', 'STRONG', 'EM']
 
-  function formtNewsContentSetting () {
+  function formtNewsContentSetting() {
     const editor_iframe = document.querySelector('.tox-edit-area>iframe').contentWindow.document.querySelector('#tinymce')
     const newsTextarea = document.querySelector('.tox-form textarea.tox-textarea')
     let newsHTML = newsTextarea.value
@@ -210,7 +232,8 @@
     appendCustomButton(handelTableStyleButton, 'handelTableStyleButton', [handelTableStyleIssues, removeDuplicateTableWrappers], newsTextarea)
   }
 
-  function formtNewsInformation (parentSelector) {
+  function formtNewsInformation(parentSelector) {
+    const decodeWindowLocationHash = decodeURIComponent(window.location.hash)
     const parent = document.querySelector(parentSelector)
     const keywordsRegex = /(\s|,|，|、)+(宿房网|宿州市)/g
     const PipeSymbolRegex = /\s*\|\s*/g
@@ -232,48 +255,45 @@
       regexs: [moreBlankRegex, PipeSymbolRegex, keywordsRegex],
       replacements: [' ', '丨', '']
     }
-    const title = parent.querySelector('[placeholder="请输入标题"]')
-    const titleX = replaceMultiple(title.value, titleReplaceRegex)
-    const keywords = parent.querySelector('[placeholder="请输入关键词"]')
-    const keywordsX = replaceMultiple(keywords.value, keywordsReplaceRegex)
-    const description = parent.querySelector('[placeholder="请输入摘要"]')
-    const descriptionX = replaceMultiple(decodeHTMLEntities(description.value), descriptionReplaceRegex)
-    const seoTitle = parent.querySelector('[placeholder="请输入seo标题"]')
-    const seoTitleX = replaceMultiple(seoTitle.value, titleReplaceRegex)
-    const seoKeywords = parent.querySelector('[placeholder="请输入seo关键词"]')
-    const seoKeywordsX = replaceMultiple(seoKeywords.value, seoKeywordsReplaceRegex)
-    const seoDescription = parent.querySelector('[placeholder="请输入seo描述"]')
-    const seoDescriptionX = replaceMultiple(decodeHTMLEntities(seoDescription.value), descriptionReplaceRegex)
-    const numberInput = parent.querySelector('input.number-input[type="number"]')
-    const editor_iframe = parent.querySelector('.tox-edit-area>iframe').contentWindow.document.querySelector('#tinymce')
-    const thumb = parent.querySelector('.el-image__inner')
-    const year = parent.querySelector('div.el-date-editor.el-input.el-input--small.el-input--prefix.el-input--suffix.el-date-editor--datetime > input').value.trim().slice(0, 4)
-    // const addImageAlternativeDescriptionDom = addImageAlternativeDescription(htmlToNode(editor_iframe.innerHTML));
-    // editor_iframe.innerHTML = addImageAlternativeDescriptionDom.innerHTML
-    setInputValue(title, `${titleX}`)
-    setInputValue(keywords, `${keywordsX}`)
-    setInputValue(description, `${descriptionX}`)
-    setInputValue(seoTitle, `${seoTitleX}`)
-    setInputValue(seoKeywords, convertStringToArrayAndRemoveDuplicates(seoKeywordsX, `宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`))
-    setInputValue(seoDescription, `${seoDescriptionX}`)
-    if (!thumb && editor_iframe.innerHTML.includes('<img')) setInputValue(numberInput, 1)
-    const yesButton = getButtonByText('.el-radio-group', '.el-radio', 'span', '是')
-    yesButton.click()
+
+    function setSeoContent() {
+      const year = parent.querySelector('div.el-date-editor.el-input.el-input--small.el-input--prefix.el-input--suffix.el-date-editor--datetime > input').value.trim().slice(0, 4)
+      const seoTitle = parent.querySelector('[placeholder="请输入seo标题"]')
+      setInputValue(seoTitle, replaceMultiple(seoTitle.value, titleReplaceRegex))
+      const seoKeywords = parent.querySelector('[placeholder="请输入seo关键词"]')
+      setInputValue(seoKeywords, convertStringToArrayAndRemoveDuplicates(replaceMultiple(seoKeywords.value, seoKeywordsReplaceRegex), `宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`))
+      const seoDescription = parent.querySelector('[placeholder="请输入seo描述"]')
+      setInputValue(seoDescription, replaceMultiple(decodeHTMLEntities(seoDescription.value), descriptionReplaceRegex))
+    }
+
+    if (decodeWindowLocationHash === '#/conventional/news/list') {
+      const title = parent.querySelector('[placeholder="请输入标题"]')
+      setInputValue(title, replaceMultiple(title.value, titleReplaceRegex))
+      const keywords = parent.querySelector('[placeholder="请输入关键词"]')
+      setInputValue(keywords, replaceMultiple(keywords.value, keywordsReplaceRegex))
+      const description = parent.querySelector('[placeholder="请输入摘要"]')
+      setInputValue(description, replaceMultiple(decodeHTMLEntities(description.value), descriptionReplaceRegex))
+      setSeoContent()
+      const numberInput = parent.querySelector('input.number-input[type="number"]')
+      const editor_iframe = parent.querySelector('.tox-edit-area>iframe').contentWindow.document.querySelector('#tinymce')
+      const thumb = parent.querySelector('.el-image__inner')
+
+      if (!thumb && editor_iframe.innerHTML.includes('<img')) setInputValue(numberInput, 1)
+      const yesButton = getButtonByText('.el-radio-group', '.el-radio', 'span', '是')
+      yesButton.click()
+    }
+
+    if (decodeWindowLocationHash.includes('楼盘资讯')) {
+      const activeTabText = document.querySelector('.list-container .list-tab .tab-item.actived>.tab-title').textContent
+      const title = parent.querySelector('[placeholder="资讯标题, 预售许可证号, 工程进度, 交房日期在此处填写"]')
+      setInputValue(title, replaceMultiple(title.value, titleReplaceRegex))
+      if (activeTabText === '楼盘动态') setSeoContent()
+    }
   }
 
-  function decodeHTMLEntities (text) {
-    const textArea = document.createElement('textarea')
-    textArea.innerHTML = text
-    return textArea.value
-  }
 
-  function createVirtualElement (dom) {
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = dom
-    return tempDiv
-  }
 
-  function removeAllEmptyParagraphs (dom) {
+  function removeAllEmptyParagraphs(dom) {
     const cloneDom = dom.cloneNode(true)
     const elements = cloneDom.querySelectorAll('p,section,span,strong,em,td')
     const blackList = ['TD']
@@ -293,7 +313,7 @@
     return cloneDom
   }
 
-  function removeBackgroundImage (dom) {
+  function removeBackgroundImage(dom) {
     const cloneDom = dom.cloneNode(true)
     const elements = cloneDom.querySelectorAll('*')
     for (let currentElement of elements) {
@@ -309,38 +329,41 @@
     return cloneDom
   }
 
-  function adjustLineHeight (dom) {
+  function adjustLineHeight(dom) {
     const clonedDom = dom.cloneNode(true)
     const elements = clonedDom.getElementsByTagName('*')
+
     for (let currentElement of elements) {
-      if (currentElement.childNodes.length === 1 && currentElement.childNodes[0].nodeType === Node.TEXT_NODE) {
-        currentElement.style.lineHeight = '1.75em'
-        if (inlineElement.includes(currentElement.nodeName)) currentElement.style.display = 'inherit'
-      } else {
-        currentElement.style.lineHeight = ''
-        currentElement.style.textIndent = ''
+      if (!currentElement.className.includes('card_view')) {
+        if (currentElement.childNodes.length === 1 && currentElement.childNodes[0].nodeType === Node.TEXT_NODE) {
+          currentElement.style.lineHeight = '1.75em'
+          if (inlineElement.includes(currentElement.nodeName)) currentElement.style.display = 'inherit'
+        } else {
+          currentElement.style.lineHeight = ''
+          currentElement.style.textIndent = ''
+        }
       }
     }
     return clonedDom
   }
 
-  function insertBlankElementBetweenPAndSection (dom) {
-    function isRootElement (element) {
+  function insertBlankElementBetweenPAndSection(dom) {
+    function isRootElement(element) {
       return element.parentNode === element.ownerDocument.documentElement
     }
 
-    function isLastElement (element, parent) {
+    function isLastElement(element, parent) {
       return element === parent.lastElementChild
     }
 
-    function createBlankDiv () {
+    function createBlankDiv() {
       const div = document.createElement('div')
       div.style.height = '15px'
       div.classList.add('use-for-blank')
       return div
     }
 
-    function removeDuplicateBlankDivs (parent) {
+    function removeDuplicateBlankDivs(parent) {
       const divs = parent.querySelectorAll('div.use-for-blank')
       for (let div of divs) {
         if (div.previousElementSibling.classList.contains('use-for-blank')) {
@@ -362,13 +385,13 @@
     return cloneDom
   }
 
-  function removeAllIdAndClassAndDataAttrs (dom) {
+  function removeAllIdAndClassAndDataAttrs(dom) {
     const cloneDom = dom.cloneNode(true)
     const elements = cloneDom.querySelectorAll('*')
     for (let currentElement of elements) {
       const clearedStyle = currentElement.style.cssText.replace(/ |!important/g, '')
       currentElement.style = clearedStyle
-      if (!currentElement.className.includes('use-for')) currentElement.removeAttribute('class')
+      if (!(currentElement.className.includes('use-for') || currentElement.className.includes('card_view'))) currentElement.removeAttribute('class')
       currentElement.removeAttribute('id')
       // 清除HTML元素上的所有data属性
       const dataAttrs = currentElement.dataset
@@ -382,7 +405,7 @@
     return cloneDom
   }
 
-  function insertImgToAncestor (dom) {
+  function insertImgToAncestor(dom) {
     const clonedDom = dom.cloneNode(true)
     const targetDom = clonedDom.querySelectorAll('p,section')
     const imgElements = clonedDom.querySelectorAll('img:only-child')
@@ -399,38 +422,40 @@
     return clonedDom
   }
 
-  function handleImageStyleIssues (dom) {
+  function handleImageStyleIssues(dom) {
     const cloneDom = dom.cloneNode(true)
     const imgElements = cloneDom.querySelectorAll('img')
     for (let currentImg of imgElements) {
-      const currentImgParent = currentImg.parentElement
-      // 获取图片原始宽度
-      const naturalWidth = currentImg.naturalWidth
-      const styleWidth = currentImg.style.width.replace('px', '')
-      // 若原始宽度大于650
-      if (naturalWidth >= 650 || styleWidth >= 650) {
-        // 如果是，则修改内联CSS的宽度为650px
-        currentImg.style.width = '650px'
-        currentImg.style.height = 'auto'
-      } else {
-        // 如果不是，则修改内联CSS的宽度为呈现的宽度
-        currentImg.style.width = `${styleWidth}px`
-        currentImg.style.height = 'auto'
+      if (!currentImg.className.includes('card_view')) {
+        const currentImgParent = currentImg.parentElement
+        // 获取图片原始宽度
+        const naturalWidth = currentImg.naturalWidth
+        const styleWidth = currentImg.style.width.replace('px', '')
+        // 若原始宽度大于650
+        if (naturalWidth >= 650 || styleWidth >= 650) {
+          // 如果是，则修改内联CSS的宽度为650px
+          currentImg.style.width = '650px'
+          currentImg.style.height = 'auto'
+        } else {
+          // 如果不是，则修改内联CSS的宽度为呈现的宽度
+          currentImg.style.width = `${styleWidth}px`
+          currentImg.style.height = 'auto'
+        }
+        if (naturalWidth < 650 && styleWidth === '100%') {
+          currentImg.style.width = '100%'
+          currentImg.style.height = 'auto'
+        }
+        currentImg.style.display = ''
+        currentImg.style.margin = ''
+        currentImg.style.verticalAlign = 'middle'
+        currentImgParent.style.textIndent = ''
+        if (!inlineElement.includes(currentImgParent.nodeName)) currentImgParent.style.textAlign = 'center'
       }
-      if (naturalWidth < 650 && styleWidth === '100%') {
-        currentImg.style.width = '100%'
-        currentImg.style.height = 'auto'
-      }
-      currentImg.style.display = ''
-      currentImg.style.margin = ''
-      currentImg.style.verticalAlign = 'middle'
-      currentImgParent.style.textIndent = ''
-      if (!inlineElement.includes(currentImgParent.nodeName)) currentImgParent.style.textAlign = 'center'
     }
     return cloneDom
   }
 
-  function addImageAlternativeDescription (dom) {
+  function addImageAlternativeDescription(dom) {
     const cloneDom = dom.cloneNode(true)
     const imgElements = cloneDom.querySelectorAll('img')
     let index = 0
@@ -444,7 +469,7 @@
     return cloneDom
   }
 
-  function handelTableStyleIssues (dom) {
+  function handelTableStyleIssues(dom) {
     const cloneDom = dom.cloneNode(true)
     const tableElements = cloneDom.querySelectorAll('table')
     const tableReplaceRegex = {
@@ -471,7 +496,7 @@
     return cloneDom
   }
 
-  function removeDuplicateTableWrappers (dom) {
+  function removeDuplicateTableWrappers(dom) {
     const cloneDom = dom.cloneNode(true)
     const tempDiv = document.createElement('div')
     tempDiv.id = 'tempDiv'

@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.29
+// @version      0.30
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -241,7 +241,7 @@
     const noneNecessarySymbol = /\s|，|、/g
     const titleReplaceRegex = {
       regexs: [moreBlankRegex, PipeSymbolRegex],
-      replacements: ['', '丨']
+      replacements: [' ', '丨']
     }
     const keywordsReplaceRegex = {
       regexs: [moreBlankRegex, keywordsRegex, noneNecessarySymbol],

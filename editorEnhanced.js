@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.30
+// @version      0.31
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -431,17 +431,17 @@
         // 获取图片原始宽度
         const naturalWidth = currentImg.naturalWidth
         const styleWidth = currentImg.style.width.replace('px', '')
-        // 若原始宽度大于650
-        if (naturalWidth >= 650 || styleWidth >= 650) {
-          // 如果是，则修改内联CSS的宽度为650px
-          currentImg.style.width = '650px'
+        // 若原始宽度大于750
+        if (naturalWidth >= 750 || styleWidth >= 750) {
+          // 如果是，则修改内联CSS的宽度为750px
+          currentImg.style.width = '750px'
           currentImg.style.height = 'auto'
         } else {
           // 如果不是，则修改内联CSS的宽度为呈现的宽度
           currentImg.style.width = `${styleWidth}px`
           currentImg.style.height = 'auto'
         }
-        if (naturalWidth < 650 && styleWidth === '100%') {
+        if (naturalWidth < 750 && styleWidth === '100%') {
           currentImg.style.width = '100%'
           currentImg.style.height = 'auto'
         }

@@ -2,12 +2,14 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.31
+// @version      0.32
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
 // @icon         https://www.0557fdc.com/admin/favicon.ico
 // @grant        none
+// @downloadURL https://update.greasyfork.org/scripts/470182/%E5%AE%BF%E6%88%BF%E7%BD%91%E5%90%8E%E5%8F%B0%E6%96%B0%E9%97%BB%E7%BC%96%E8%BE%91%E5%99%A8%E5%8A%9F%E8%83%BD%E5%A2%9E%E5%BC%BA.user.js
+// @updateURL https://update.greasyfork.org/scripts/470182/%E5%AE%BF%E6%88%BF%E7%BD%91%E5%90%8E%E5%8F%B0%E6%96%B0%E9%97%BB%E7%BC%96%E8%BE%91%E5%99%A8%E5%8A%9F%E8%83%BD%E5%A2%9E%E5%BC%BA.meta.js
 // ==/UserScript==
 (function () {
   'use strict'
@@ -75,11 +77,13 @@
   }
 
   function setInputValue(element, value) {
-    element.value = value
-    element.dispatchEvent(new Event('input', {
-      bubbles: false,
-      cancelable: true
-    }))
+    const focus = new Event('focus',{ bubbles: false,cancelable: true })
+    const input = new Event('input',{ bubbles: false,cancelable: true })
+    const blur = new Event('blur',{ bubbles: false,cancelable: true })
+    element.value = value;
+    element.dispatchEvent(focus);
+    element.dispatchEvent(input);
+    element.dispatchEvent(blur);
   }
 
   function htmlToNode(htmlString) {
@@ -131,22 +135,6 @@
         </svg>
       </span>
     </button>`
-  }
-
-  function copyToClipboard(txt) {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(txt).then(function () {
-        alert('复制成功！')
-      }, function () {
-        alert('复制失败！')
-      })
-    } else if (window.clipboardData) {
-      window.clipboardData.clearData()
-      window.clipboardData.setData('Text', txt)
-      alert('复制成功！')
-    } else {
-      alert('浏览器不支持复制到剪贴板！')
-    }
   }
 
   function replaceMultiple(str, options) {

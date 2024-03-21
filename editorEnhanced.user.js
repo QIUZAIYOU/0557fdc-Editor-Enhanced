@@ -320,7 +320,6 @@
     function adjustLineHeight(dom) {
         const clonedDom = dom.cloneNode(true)
         const elements = clonedDom.getElementsByTagName('*')
-
         for (let currentElement of elements) {
             if (!currentElement.className.includes('card_view')) {
                 if (currentElement.childNodes.length === 1 && currentElement.childNodes[0].nodeType === Node.TEXT_NODE) {
@@ -413,25 +412,38 @@
     // }
 
     function handleImageStyleIssues(dom) {
+        const targetWidth = 750
         const cloneDom = dom.cloneNode(true)
         const imgElements = cloneDom.querySelectorAll('img')
+        // const getParentElement = (element) => {
+        //     let parent = element.parentNode
+        //     while (parent?.nodeName !== 'P') {
+        //         parent = parent?.parentNode
+        //         if (parent?.nodeName === 'P') {
+        //             break
+        //         }
+        //     }
+        //     return parent
+        // }
         for (let currentImg of imgElements) {
             if (!currentImg.className.includes('card_view')) {
-                const currentImgParent = currentImg.parentElement
+                // const currentImgParent = getParentElement(currentImg).
+                const currentImgParent = currentImg.parentNode
+                // console.log("🚀 ~ handleImageStyleIssues ~ currentImgParent:", currentImgParent)
                 // 获取图片原始宽度
                 const naturalWidth = currentImg.naturalWidth
                 const styleWidth = currentImg.style.width.replace('px', '')
                 // 若原始宽度大于750
-                if (naturalWidth >= 750 || styleWidth >= 750) {
+                if (naturalWidth >= targetWidth || styleWidth >= targetWidth) {
                     // 如果是，则修改内联CSS的宽度为750px
-                    currentImg.style.width = '750px'
+                    currentImg.style.width = `${targetWidth}px`
                     currentImg.style.height = 'auto'
                 } else {
                     // 如果不是，则修改内联CSS的宽度为呈现的宽度
                     currentImg.style.width = `${styleWidth}px`
                     currentImg.style.height = 'auto'
                 }
-                if (naturalWidth < 750 && styleWidth === '100%') {
+                if (naturalWidth < targetWidth && styleWidth === '100%') {
                     currentImg.style.width = '100%'
                     currentImg.style.height = 'auto'
                 }

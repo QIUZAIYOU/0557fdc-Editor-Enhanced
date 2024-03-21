@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.33
+// @version      0.34
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -77,9 +77,9 @@
     }
 
     function setInputValue(element, value) {
-        const focus = new Event('focus',{ bubbles: false,cancelable: true })
-        const input = new Event('input',{ bubbles: false,cancelable: true })
-        const blur = new Event('blur',{ bubbles: false,cancelable: true })
+        const focus = new Event('focus', { bubbles: false, cancelable: true })
+        const input = new Event('input', { bubbles: false, cancelable: true })
+        const blur = new Event('blur', { bubbles: false, cancelable: true })
         element.value = value;
         element.dispatchEvent(focus);
         element.dispatchEvent(input);
@@ -135,7 +135,7 @@
         </svg>
       </span>
     </button>`
-  }
+    }
 
     function replaceMultiple(str, options) {
         let result = str
@@ -155,11 +155,11 @@
             replacements: [' ', ',']
         }
         const fullStr = `${replaceMultiple(str, replaceRegex)}${str ? ',' : ''}${addonStr}`
-    const arr = fullStr.replace(/,+/g, ',').split(',')
-    const uniqueSet = new Set(arr)
-    const newStr = Array.from(uniqueSet).join(',')
-    return newStr
-  }
+        const arr = fullStr.replace(/,+/g, ',').split(',')
+        const uniqueSet = new Set(arr)
+        const newStr = Array.from(uniqueSet).join(',')
+        return newStr
+    }
 
     function executeFunctionsSequentially(functions, input) {
         if (Array.isArray(functions)) {
@@ -347,6 +347,7 @@
         function createBlankDiv() {
             const div = document.createElement('div')
             div.style.height = '15px'
+            div.style.overflow = 'hidden'
             div.classList.add('use-for-blank')
             return div
         }
@@ -427,21 +428,21 @@
                 } else {
                     // 如果不是，则修改内联CSS的宽度为呈现的宽度
                     currentImg.style.width = `${styleWidth}px`
-          currentImg.style.height = 'auto'
+                    currentImg.style.height = 'auto'
+                }
+                if (naturalWidth < 750 && styleWidth === '100%') {
+                    currentImg.style.width = '100%'
+                    currentImg.style.height = 'auto'
+                }
+                currentImg.style.display = ''
+                currentImg.style.margin = ''
+                currentImg.style.verticalAlign = 'middle'
+                currentImgParent.style.textIndent = ''
+                if (!inlineElement.includes(currentImgParent.nodeName)) currentImgParent.style.textAlign = 'center'
+            }
         }
-          if (naturalWidth < 750 && styleWidth === '100%') {
-              currentImg.style.width = '100%'
-              currentImg.style.height = 'auto'
-          }
-          currentImg.style.display = ''
-          currentImg.style.margin = ''
-          currentImg.style.verticalAlign = 'middle'
-          currentImgParent.style.textIndent = ''
-          if (!inlineElement.includes(currentImgParent.nodeName)) currentImgParent.style.textAlign = 'center'
-      }
+        return cloneDom
     }
-      return cloneDom
-  }
 
     function addImageAlternativeDescription(dom) {
         const cloneDom = dom.cloneNode(true)

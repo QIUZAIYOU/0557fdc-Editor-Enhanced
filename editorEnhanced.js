@@ -2,7 +2,7 @@
 // @name         宿房网后台新闻编辑器功能增强
 // @license      GPL-3.0 License
 // @namespace    https://github.com/QIUZAIYOU/0557FDC-EditorEnhanced
-// @version      0.34
+// @version      0.35
 // @description  宿房网后台新闻编辑器功能增强,自动优化标题及描述,扩展排版功能
 // @author       QIAN
 // @match        https://www.0557fdc.com/admin/*
@@ -31,19 +31,19 @@
                 for (let node of addedNodes) {
                     if (node.classList && node.classList.contains('tox-dialog-wrap') && !isAdded()) {
                         const title = document.querySelector('.tox-dialog__title')
-                        if (title.textContent === '源代码') formtNewsContentSetting()
+                        if (title.textContent === '源代码') formatNewsContentSetting()
                     }
                     if (node.classList && node.classList.contains('tox-tinymce') && !isAdded()) {
                         const newsSaveButton = getButtonByText('.el-dialog', '.el-button', 'span', '保存')
                         const newsSubmitButton = getButtonByText('.el-dialog', '.el-button', 'span', '提交')
                         if (newsSaveButton) {
                             newsSaveButton.addEventListener('click', () => {
-                                formtNewsInformation('#formContainer')
+                                formatNewsInformation('#formContainer')
                             }, true)
                         }
                         if (newsSubmitButton) {
                             newsSubmitButton.addEventListener('click', () => {
-                                formtNewsInformation('#formContainer')
+                                formatNewsInformation('#formContainer')
                             }, true)
                         }
                     }
@@ -71,9 +71,9 @@
     }
 
     function createVirtualElement(dom) {
-        const tempDiv = document.createElement('div')
-        tempDiv.innerHTML = dom
-        return tempDiv
+        const tempElement = document.createElement('div')
+        tempElement.innerHTML = dom
+        return tempElement
     }
 
     function setInputValue(element, value) {
@@ -87,17 +87,17 @@
     }
 
     function htmlToNode(htmlString) {
-        const tempDiv = document.createElement('div')
-        tempDiv.innerHTML = htmlString.trim()
-        return tempDiv
+        const tempElement = document.createElement('div')
+        tempElement.innerHTML = htmlString.trim()
+        return tempElement
     }
 
     function appendHTMLString(parentSelector, htmlString) {
         const parentDom = document.querySelector(parentSelector)
         if (parentDom ?? false) {
-            const tempDiv = document.createElement('div')
-            tempDiv.innerHTML = htmlString.trim()
-            const node = tempDiv.firstChild
+            const tempElement = document.createElement('div')
+            tempElement.innerHTML = htmlString.trim()
+            const node = tempElement.firstChild
             parentDom.appendChild(node)
         }
     }
@@ -140,21 +140,21 @@
     function replaceMultiple(str, options) {
         let result = str
         const {
-            regexs,
+            regexp,
             replacements
         } = options
-        for (const i in regexs) {
-            result = result.replace(regexs[i], replacements[i])
+        for (const i in regexp) {
+            result = result.replace(regexp[i], replacements[i])
         }
         return result
     }
 
     function convertStringToArrayAndRemoveDuplicates(str, addonStr) {
-        const replaceRegex = {
-            regexs: [/\s+/g, /\s|，|、/g],
+        const replaceRegexp = {
+            regexp: [/\s+/g, /\s|，|、/g],
             replacements: [' ', ',']
         }
-        const fullStr = `${replaceMultiple(str, replaceRegex)}${str ? ',' : ''}${addonStr}`
+        const fullStr = `${replaceMultiple(str, replaceRegexp)}${str ? ',' : ''}${addonStr}`
         const arr = fullStr.replace(/,+/g, ',').split(',')
         const uniqueSet = new Set(arr)
         const newStr = Array.from(uniqueSet).join(',')
@@ -196,7 +196,7 @@
     // 执行类函数
     const inlineElement = ['SPAN', 'STRONG', 'EM']
 
-    function formtNewsContentSetting() {
+    function formatNewsContentSetting() {
         const editor_iframe = document.querySelector('.tox-edit-area>iframe').contentWindow.document.querySelector('#tinymce')
         const newsTextarea = document.querySelector('.tox-form textarea.tox-textarea')
         let newsHTML = newsTextarea.value
@@ -220,47 +220,47 @@
         appendCustomButton(handelTableStyleButton, 'handelTableStyleButton', [handelTableStyleIssues, removeDuplicateTableWrappers], newsTextarea)
     }
 
-    function formtNewsInformation(parentSelector) {
+    function formatNewsInformation(parentSelector) {
         const decodeWindowLocationHash = decodeURIComponent(window.location.hash)
         const parent = document.querySelector(parentSelector)
-        const keywordsRegex = /(\s|,|，|、)+(宿房网|宿州市)/g
-        const PipeSymbolRegex = /\s*\|\s*/g
-        const moreBlankRegex = /\s+/g
+        const keywordsRegexp = /(\s|,|，|、)+(宿房网|宿州市)/g
+        const PipeSymbolRegexp = /\s*\|\s*/g
+        const moreBlankRegexp = /\s+/g
         const noneNecessarySymbol = /\s|，|、/g
-        const titleReplaceRegex = {
-            regexs: [moreBlankRegex, PipeSymbolRegex],
+        const titleReplaceRegexp = {
+            regexp: [moreBlankRegexp, PipeSymbolRegexp],
             replacements: [' ', '丨']
         }
-        const keywordsReplaceRegex = {
-            regexs: [moreBlankRegex, keywordsRegex, noneNecessarySymbol],
+        const keywordsReplaceRegexp = {
+            regexp: [moreBlankRegexp, keywordsRegexp, noneNecessarySymbol],
             replacements: [' ', '', ',']
         }
-        const seoKeywordsReplaceRegex = {
-            regexs: [moreBlankRegex, noneNecessarySymbol],
+        const seoKeywordsReplaceRegexp = {
+            regexp: [moreBlankRegexp, noneNecessarySymbol],
             replacements: [' ', ',']
         }
-        const descriptionReplaceRegex = {
-            regexs: [moreBlankRegex, PipeSymbolRegex, keywordsRegex],
+        const descriptionReplaceRegexp = {
+            regexp: [moreBlankRegexp, PipeSymbolRegexp, keywordsRegexp],
             replacements: [' ', '丨', '']
         }
 
         function setSeoContent() {
             const year = parent.querySelector('div.el-date-editor.el-input.el-input--small.el-input--prefix.el-input--suffix.el-date-editor--datetime > input').value.trim().slice(0, 4)
             const seoTitle = parent.querySelector('[placeholder="请输入seo标题"]')
-            setInputValue(seoTitle, replaceMultiple(seoTitle.value, titleReplaceRegex))
+            setInputValue(seoTitle, replaceMultiple(seoTitle.value, titleReplaceRegexp))
             const seoKeywords = parent.querySelector('[placeholder="请输入seo关键词"]')
-            setInputValue(seoKeywords, convertStringToArrayAndRemoveDuplicates(replaceMultiple(seoKeywords.value, seoKeywordsReplaceRegex), `宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`))
+            setInputValue(seoKeywords, convertStringToArrayAndRemoveDuplicates(replaceMultiple(seoKeywords.value, seoKeywordsReplaceRegexp), `宿州市,宿房网,${year}宿州资讯,${year}宿州楼市资讯`))
             const seoDescription = parent.querySelector('[placeholder="请输入seo描述"]')
-            setInputValue(seoDescription, replaceMultiple(decodeHTMLEntities(seoDescription.value), descriptionReplaceRegex))
+            setInputValue(seoDescription, replaceMultiple(decodeHTMLEntities(seoDescription.value), descriptionReplaceRegexp))
         }
 
         if (decodeWindowLocationHash === '#/conventional/news/list') {
             const title = parent.querySelector('[placeholder="请输入标题"]')
-            setInputValue(title, replaceMultiple(title.value, titleReplaceRegex))
+            setInputValue(title, replaceMultiple(title.value, titleReplaceRegexp))
             const keywords = parent.querySelector('[placeholder="请输入关键词"]')
-            setInputValue(keywords, replaceMultiple(keywords.value, keywordsReplaceRegex))
+            setInputValue(keywords, replaceMultiple(keywords.value, keywordsReplaceRegexp))
             const description = parent.querySelector('[placeholder="请输入摘要"]')
-            setInputValue(description, replaceMultiple(decodeHTMLEntities(description.value), descriptionReplaceRegex))
+            setInputValue(description, replaceMultiple(decodeHTMLEntities(description.value), descriptionReplaceRegexp))
             setSeoContent()
             const numberInput = parent.querySelector('input.number-input[type="number"]')
             const editor_iframe = parent.querySelector('.tox-edit-area>iframe').contentWindow.document.querySelector('#tinymce')
@@ -274,7 +274,7 @@
         if (decodeWindowLocationHash.includes('楼盘资讯')) {
             const activeTabText = document.querySelector('.list-container .list-tab .tab-item.actived>.tab-title').textContent
             const title = parent.querySelector('[placeholder="资讯标题, 预售许可证号, 工程进度, 交房日期在此处填写"]')
-            setInputValue(title, replaceMultiple(title.value, titleReplaceRegex))
+            setInputValue(title, replaceMultiple(title.value, titleReplaceRegexp))
             if (activeTabText === '楼盘动态') setSeoContent()
         }
     }
@@ -344,17 +344,18 @@
             return element === parent.lastElementChild
         }
 
-        function createBlankDiv() {
+        function createBlankElement() {
             const div = document.createElement('div')
             div.style.height = '15px'
             div.style.overflow = 'hidden'
-            div.classList.add('use-for-blank')
+            div.className = 'use-for-blank'
+            div.innerHTML = ''
             return div
         }
 
-        function removeDuplicateBlankDivs(parent) {
-            const divs = parent.querySelectorAll('div.use-for-blank')
-            for (let div of divs) {
+        function removeDuplicateBlankElements(parent) {
+            const elements = parent.querySelectorAll('div.use-for-blank')
+            for (let div of elements) {
                 if (div.previousElementSibling.classList.contains('use-for-blank')) {
                     parent.removeChild(div)
                 }
@@ -365,10 +366,10 @@
         for (let currentElement of elements) {
             const parent = currentElement.parentNode
             if (!isRootElement(currentElement) && !isLastElement(currentElement, parent)) {
-                const div = createBlankDiv()
+                const div = createBlankElement()
                 parent.insertBefore(div, currentElement.nextSibling)
                 // 移除相邻的重复元素
-                removeDuplicateBlankDivs(parent)
+                removeDuplicateBlankElements(parent)
             }
         }
         return cloneDom
@@ -394,22 +395,22 @@
         return cloneDom
     }
 
-    function insertImgToAncestor(dom) {
-        const clonedDom = dom.cloneNode(true)
-        const targetDom = clonedDom.querySelectorAll('p,section')
-        const imgElements = clonedDom.querySelectorAll('img:only-child')
-        for (let element of imgElements) {
-            const clonedImg = element.cloneNode(true)
-            let parent = element.parentNode
-            while (parent.nodeName !== 'BODY' && parent.children.length === 1) {
-                element = parent
-                parent = parent.parentNode
-            }
-            element.innerHTML = ''
-            element.appendChild(clonedImg)
-        }
-        return clonedDom
-    }
+    // function insertImgToAncestor(dom) {
+    //     const clonedDom = dom.cloneNode(true)
+    //     const targetDom = clonedDom.querySelectorAll('p,section')
+    //     const imgElements = clonedDom.querySelectorAll('img:only-child')
+    //     for (let element of imgElements) {
+    //         const clonedImg = element.cloneNode(true)
+    //         let parent = element.parentNode
+    //         while (parent.nodeName !== 'BODY' && parent.children.length === 1) {
+    //             element = parent
+    //             parent = parent.parentNode
+    //         }
+    //         element.innerHTML = ''
+    //         element.appendChild(clonedImg)
+    //     }
+    //     return clonedDom
+    // }
 
     function handleImageStyleIssues(dom) {
         const cloneDom = dom.cloneNode(true)
@@ -461,8 +462,8 @@
     function handelTableStyleIssues(dom) {
         const cloneDom = dom.cloneNode(true)
         const tableElements = cloneDom.querySelectorAll('table')
-        const tableReplaceRegex = {
-            regexs: [/(<table\b[^>]*>)/gi, /(<\/table>)/gi],
+        const tableReplaceRegexp = {
+            regexp: [/(<table\b[^>]*>)/gi, /(<\/table>)/gi],
             replacements: ['<div class="use-for-table-wrapper" style="overflow:auto">$1', '$1</div>']
         }
         for (let currentTable of tableElements) {
@@ -481,22 +482,22 @@
             }
         }
         const cloneDomHTML = cloneDom.innerHTML
-        cloneDom.innerHTML = replaceMultiple(cloneDomHTML, tableReplaceRegex)
+        cloneDom.innerHTML = replaceMultiple(cloneDomHTML, tableReplaceRegexp)
         return cloneDom
     }
 
     function removeDuplicateTableWrappers(dom) {
         const cloneDom = dom.cloneNode(true)
-        const tempDiv = document.createElement('div')
-        tempDiv.id = 'tempDiv'
-        tempDiv.innerHTML = cloneDom.innerHTML
-        const divs = tempDiv.querySelectorAll('#tempDiv>div.use-for-table-wrapper')
-        for (const div of divs) {
-            const cloneTable = div.querySelector('table').cloneNode(true)
-            div.innerHTML = ''
-            div.appendChild(cloneTable)
+        const tempElement = document.createElement('div')
+        tempElement.id = 'tempElement'
+        tempElement.innerHTML = cloneDom.innerHTML
+        const elements = tempElement.querySelectorAll('#tempElement>div.use-for-table-wrapper')
+        for (const element of elements) {
+            const cloneTable = element.querySelector('table').cloneNode(true)
+            element.innerHTML = ''
+            element.appendChild(cloneTable)
         }
-        cloneDom.innerHTML = tempDiv.innerHTML
+        cloneDom.innerHTML = tempElement.innerHTML
         return cloneDom
     }
 })()
